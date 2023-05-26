@@ -1,0 +1,101 @@
+---
+import { log } from 'astro/dist/core/logger/core';
+import Layout from '../layouts/Layout.astro';
+import Juego from '../components/Juego.astro';
+import Post from '../components/Post.astro';
+import Noticia from '../components/Noticia.astro';
+import ComponenteRect from '../components/ComponenteRect';
+
+
+const urlJuegos = `${import.meta.env.PUBLIC_API_URL}/video-juegos?populate=imagen`
+const urlPost = `${import.meta.env.PUBLIC_API_URL}/posts?populate=imagen`
+const urlNoticia = `${import.meta.env.PUBLIC_API_URL}/noticia?populate=imagen`
+
+const [resJuegos, resPosts, resNoticia] = await Promise.all([
+	fetch(urlJuegos),
+	fetch(urlPost),
+	fetch(urlNoticia)
+])
+
+const [{data: juegos}, {data:posts}, {data:noticia}] = await Promise.all([
+	resJuegos.json(),
+	resPosts.json(),
+	resNoticia.json()
+])
+
+
+
+
+
+---
+
+<Layout title="Inicio" description="Tienda de Videojuegos">
+	<main class="contenedor">
+
+		<h1 class="heading">Nuestros Productos</h1>
+
+		<div class="grid">
+			{juegos?.map(juego => (
+				<Juego
+					nombre={juego.attributes.nombre}
+					descripcion={juego.attributes.descripcion}
+					url={juego.attributes.url}
+					precio={juego.attributes.precio}
+					imagen={juego.attributes.imagen.data.attributes.url}
+				/>
+			))}
+		</div>
+	
+
+	<Noticia
+		titulo={noticia.attributes.titulo}
+		contenido={noticia.attributes.contenido}
+		imagen={noticia.attributes.imagen.data.attributes.url}
+	/>
+
+	<ComponenteRect/>
+
+
+	<section class="contenedor">
+				
+		<h1 class="heading">Blog</h1>
+
+		<div class="grid">
+			{posts?.map(post => (
+				<Post
+					titulo={post.attributes.titulo}
+					publishedAt={post.attributes.publishedAt}
+					contenido={post.attributes.contenido}
+					url={post.attributes.url}
+					imagen={post.attributes.imagen.data.attributes.url}
+				/>
+			))}
+		</div>
+	
+	</section>
+</main>
+
+	
+</Layout>
+
+<style>
+	.grid
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+@media (min-width:768px){
+    .grid
+    {
+    grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width:992px){
+    .grid
+    {
+    grid-template-columns: repeat(3, 1fr);
+    }
+}
+</style>

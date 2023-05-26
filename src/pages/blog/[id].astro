@@ -1,0 +1,132 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { formatearFecha } from "../../helpers";
+
+export async function getStaticPaths() 
+{
+    const url = `${import.meta.env.PUBLIC_API_URL}/posts?populate=imagen`
+    const respuesta = await fetch(url)
+    const {data} = await respuesta.json()
+
+    console.log(data);
+    
+    
+    return data.map(post => ({
+        params: {
+            id: post.attributes.url
+
+        },
+        props: {
+            post: post.attributes
+        }
+    }))
+}
+
+
+const {titulo, contenido, publishedAt, imagen} = Astro.props.post
+
+
+
+---
+
+<Layout title={titulo} description="Tienda de Videojuegos">
+
+    <article class="post">
+      <img src={imagen.data.attributes.url} alt="imagen juego ${nombre}">
+      <div class="contenido">
+          <h3>{titulo}</h3>
+          <p class="fecha">{formatearFecha(publishedAt)}</p>
+          <p class="descripcion">{contenido}</p>
+  
+  
+      </div>
+    </article>
+  
+  </Layout>
+
+  <style>
+    .blog{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap:4rem;
+
+
+}
+
+@media(min-width: 768px){
+    .blog {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(min-width: 992px){
+    .blog {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.post {
+    max-width: 80rem;
+    margin: 0 auto;
+}
+
+.post .contenido{
+    padding: 1.5rem;
+}
+
+.post .contenido h3{
+    font-weight: 900;
+    font-size: 5rem;
+    font-family: var(--font-family3);
+
+
+}
+
+.post .resumen {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow:hidden;
+}
+
+.fecha {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2f0297b9;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+.enlace {
+    background-color: #004c7a93;
+    color: #fff;
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 900;
+  }
+  
+.enlace:hover {
+    background-color: #005fa3;
+  }
+
+.texto{
+    font-size: 20px;
+    font-family: var(--font-family1);
+    white-space: pre-wrap;
+    line-height: 1.5;
+    letter-spacing: 1px;
+ }
+ .titulo{
+    text-transform: uppercase;
+    font-family: var(--font-family3);
+    font-size: 1rem;
+ }
+
+ .mt-3{
+    margin-top: 3rem;
+ }
+  </style>

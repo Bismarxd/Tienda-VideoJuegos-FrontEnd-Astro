@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Juego from '../components/Juego.astro';
+
+const url = `${import.meta.env.PUBLIC_API_URL}/video-juegos?populate=imagen`
+const respuesta = await fetch(url)
+const {data} = await respuesta.json()
+
+---
+
+<Layout title="tienda" description="Tienda de Videojuegos">
+	<main class="contenedor">
+
+		<h1 class="heading">Nuestros Productos</h1>
+
+		<div class="juegos-grid">
+			{data?.map(juego => (
+				<Juego
+					nombre={juego.attributes.nombre}
+					descripcion={juego.attributes.descripcion}
+					url={juego.attributes.url}
+					precio={juego.attributes.precio}
+					imagen={juego.attributes.imagen.data.attributes.url}
+				/>
+			))}
+		</div>
+		
+	</main>
+</Layout>
+
+<style is:global>
+	.juegos-grid
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+@media (min-width:768px){
+    .juegos-grid
+    {
+    grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width:992px){
+    .juegos-grid
+    {
+    grid-template-columns: repeat(3, 1fr);
+    }
+}
+</style>
